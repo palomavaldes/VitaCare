@@ -49,5 +49,5 @@ open up localhost:
 - Python
 - LangChain
 - Flask
-- GPT
+- Cohere LLM
 - Pinecone
