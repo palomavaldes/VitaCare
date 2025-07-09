@@ -1,0 +1,147 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>VitaCare</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
+	</head>
+	
+	
+	<body>
+		<div class="chat-container">
+        <div class="chat-header">
+            <div class="bot-avatar">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="bot-name">VitaCare</div>
+            <div class="bot-tagline">Your friendly health companion! 🌟</div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <i class="fas fa-hand-peace"></i>
+                <h3>Hello there!</h3>
+                <p>I'm VitaCare, your personal health assistant. Ask me anything about health, wellness, medications, or symptoms. I'm here to help! 💚</p>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="message-avatar">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <form id="messageForm" class="input-container">
+                <input type="text" id="messageInput" class="message-input" placeholder="Ask me about your health..." autocomplete="off" required>
+                <button type="submit" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+		
+		<script>
+        $(document).ready(function() {
+            // Updated to use the correct form and input IDs
+            $("#messageForm").on("submit", function(event) {
+                event.preventDefault();
+                
+                const date = new Date();
+                const hour = date.getHours().toString().padStart(2, '0');
+                const minute = date.getMinutes().toString().padStart(2, '0');
+                const str_time = hour + ":" + minute;
+                
+                var rawText = $("#messageInput").val().trim();
+                
+                if (!rawText) return;
+                
+                // Create user message
+                var userHtml = `
+                    <div class="message user">
+                        <div class="message-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="message-bubble">
+                            ${rawText}
+                            <div class="message-time">${str_time}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Clear input and add user message
+                $("#messageInput").val("");
+                $("#chatMessages").append(userHtml);
+                
+                // Show typing indicator
+                $("#typingIndicator").show();
+                
+                // Scroll to bottom
+                $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
+                
+                // Send AJAX request
+                $.ajax({
+                    data: {
+                        msg: rawText,
+                    },
+                    type: "POST",
+                    url: "/get",
+                }).done(function(data) {
+                    // Hide typing indicator
+                    $("#typingIndicator").hide();
+                    
+                    // Create bot message
+                    var botHtml = `
+                        <div class="message bot">
+                            <div class="message-avatar">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="message-bubble">
+                                ${data}
+                                <div class="message-time">${str_time}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    $("#chatMessages").append(botHtml);
+                    
+                    // Scroll to bottom
+                    $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
+                }).fail(function() {
+                    // Hide typing indicator on error
+                    $("#typingIndicator").hide();
+                    
+                    // Show error message
+                    var errorHtml = `
+                        <div class="message bot">
+                            <div class="message-avatar">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="message-bubble">
+                                Sorry, I'm having trouble connecting right now. Please try again later.
+                                <div class="message-time">${str_time}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    $("#chatMessages").append(errorHtml);
+                    $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
+                });
+            });
+        });
+    </script>
+        
+    </body>
+</html>
