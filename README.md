@@ -2,7 +2,12 @@
 This is a medical chat bot using generative AI.
 
 # How to run VitaCare:
+
 Step 1: Clone the repository
+<br>
+Step 1.5: Create a folder "data" and insert the medical book pdf you will use for data. Name it "medical_book.pdf". I was unable to upload mine because the file is too big.
+<br>
+
 Step 2: Create a conda environment after opening the repository
 ```bash
 conda create --name llmpp python=3.10 -y
@@ -44,5 +49,5 @@ open up localhost:
 - Python
 - LangChain
 - Flask
-- GPT
+- Cohere LLM
 - Pinecone
